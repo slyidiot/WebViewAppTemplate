@@ -2,6 +2,7 @@ package com.inskade.webviewapptemplate;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -37,7 +38,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         findViews();
         dummyView.setOnClickListener(this);
-        loadSite();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                loadSite();
+            }
+        }, 2500);
     }
 
     private void loadSite() {

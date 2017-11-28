@@ -1,0 +1,11 @@
+<resources>
+
+    <!--Change These-->
+    <string name="app_name">Web View App Template</string>
+    <string name="loading_text_to_display">LOADING</string>
+    <string name="url_to_load">https://www.google.com</string>
+
+    <!--Changing Not Recommended-->
+    <string name="no_internet">NO INTERNET CONNECTION\nTAP TO RETRY</string>
+
+</resources>

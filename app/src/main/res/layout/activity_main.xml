@@ -10,12 +10,19 @@
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/loading_anim"
         android:layout_width="wrap_content"
-        android:layout_height="200dp"
-        android:layout_centerInParent="true"
+        android:layout_height="150dp"
+        android:layout_alignParentBottom="true"
         android:paddingBottom="30dp"
         app:lottie_autoPlay="true"
         app:lottie_fileName="animFiles/loading.json"
         app:lottie_loop="true" />
+
+    <ImageView
+        android:id="@+id/app_icon"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/hi_res_512" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/no_internet_anim"
@@ -29,15 +36,16 @@
         app:lottie_loop="true" />
 
     <TextView
-        android:id="@+id/app_name_text"
+        android:id="@+id/no_internet_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="50dp"
         android:fontFamily="sans-serif-light"
         android:gravity="center"
-        android:text="@string/loading_text_to_display"
-        android:textColor="@color/colorAccent" />
+        android:text="@string/no_internet"
+        android:textColor="@color/colorAccent"
+        android:visibility="gone" />
 
     <WebView
         android:id="@+id/main_web_view"

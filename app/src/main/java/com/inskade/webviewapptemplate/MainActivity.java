@@ -1,23 +1,33 @@
 package com.inskade.webviewapptemplate;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import static android.content.DialogInterface.BUTTON_NEGATIVE;
+import static android.content.DialogInterface.BUTTON_NEUTRAL;
+import static android.content.DialogInterface.BUTTON_POSITIVE;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, DialogInterface.OnClickListener {
 
     private WebView webView;
     private LottieAnimationView loadingAnimationView;
     private LottieAnimationView noInternetAnimationView;
-    private TextView appName;
+    private TextView noInternetText;
+    private ImageView appIcon;
     private View dummyView;
+
+    private AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,20 +44,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             if (!isConnected()) {
                 noInternetAnimationView.setVisibility(View.VISIBLE);
+                noInternetText.setVisibility(View.VISIBLE);
                 loadingAnimationView.setVisibility(View.GONE);
-                appName.setText(getString(R.string.no_internet));
+                noInternetText.setText(getString(R.string.no_internet));
                 dummyView.setVisibility(View.VISIBLE);
+                appIcon.setVisibility(View.GONE);
             } else {
                 noInternetAnimationView.setVisibility(View.GONE);
                 loadingAnimationView.setVisibility(View.VISIBLE);
-                appName.setText(getString(R.string.loading_text_to_display));
+                noInternetText.setVisibility(View.GONE);
                 dummyView.setVisibility(View.GONE);
+                appIcon.setVisibility(View.VISIBLE);
                 webView.setWebViewClient(new WebViewClient() {
                     @Override
                     public void onPageFinished(WebView view, String url) {
                         loadingAnimationView.setVisibility(View.GONE);
-                        appName.setVisibility(View.GONE);
+                        noInternetText.setVisibility(View.GONE);
                         webView.setVisibility(View.VISIBLE);
+                        appIcon.setVisibility(View.GONE);
                     }
                 });
                 webView.loadUrl(getString(R.string.url_to_load));
@@ -60,9 +74,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void findViews() {
         webView = findViewById(R.id.main_web_view);
         loadingAnimationView = findViewById(R.id.loading_anim);
-        appName = findViewById(R.id.app_name_text);
+        noInternetText = findViewById(R.id.no_internet_text);
         dummyView = findViewById(R.id.dummy_for_onclick);
         noInternetAnimationView = findViewById(R.id.no_internet_anim);
+        appIcon = findViewById(R.id.app_icon);
     }
 
     public boolean isConnected() throws InterruptedException, IOException {
@@ -75,6 +90,40 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
             case R.id.dummy_for_onclick:
                 loadSite();
+                break;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (webView.canGoBack()) {
+            webView.goBack();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Exit?");
+            builder.setMessage("Are you sure you want to exit?");
+            builder.setPositiveButton("Yes", this);
+            builder.setNeutralButton("Rate App", this);
+            builder.setNegativeButton("No", this);
+
+            // create and show the alert dialog
+            dialog = builder.create();
+            dialog.show();
+
+        }
+    }
+
+    @Override
+    public void onClick(DialogInterface dialogInterface, int i) {
+        switch (i) {
+            case BUTTON_POSITIVE:
+                finish();
+                break;
+            case BUTTON_NEUTRAL:
+                //TODO:Add rating feature
+                break;
+            case BUTTON_NEGATIVE:
+                dialog.dismiss();
                 break;
         }
     }

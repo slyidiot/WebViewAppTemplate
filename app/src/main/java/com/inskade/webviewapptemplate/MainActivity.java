@@ -1,8 +1,10 @@
 package com.inskade.webviewapptemplate;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -12,6 +14,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 
 import java.io.IOException;
 
@@ -30,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private AlertDialog dialog;
 
+    private FirebaseRemoteConfig mFirebaseRemoteConfig;
+
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +45,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         findViews();
+
+        webView.setWebViewClient(new WebViewClient());
+        webView.getSettings().setJavaScriptEnabled(true);
+
+        fetchUrlFromFirebase();
         dummyView.setOnClickListener(this);
 
         Handler handler = new Handler();
@@ -46,6 +59,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 loadSite();
             }
         }, 2500);
+    }
+
+    private void fetchUrlFromFirebase() {
+        long cacheExpiration = 3600; //in seconds not milliseconds
+
+        mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        mFirebaseRemoteConfig.fetch(cacheExpiration)
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            mFirebaseRemoteConfig.activateFetched();
+                        } else {
+                            //handle errors
+                        }
+                        loadUrl();
+                    }
+                });
+    }
+
+    private void loadUrl() {
+        webView.loadUrl(mFirebaseRemoteConfig.getString("url_to_load"));
     }
 
     private void loadSite() {
@@ -72,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         appIcon.setVisibility(View.GONE);
                     }
                 });
-                webView.loadUrl(getString(R.string.url_to_load));
+                fetchUrlFromFirebase();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -107,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (webView.canGoBack()) {
             webView.goBack();
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setTitle("Exit?");
             builder.setMessage("Are you sure you want to exit?");
             builder.setPositiveButton("Yes", this);

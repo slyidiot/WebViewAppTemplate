@@ -1,7 +1,11 @@
 package com.inskade.webviewapptemplate;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -62,9 +66,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void fetchUrlFromFirebase() {
-        long cacheExpiration = 3600; //in seconds not milliseconds
 
         mFirebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
+        long cacheExpiration = 3600; //in seconds not milliseconds
+
         mFirebaseRemoteConfig.fetch(cacheExpiration)
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
@@ -128,6 +133,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return (Runtime.getRuntime().exec(command).waitFor() == 0);
     }
 
+    public void rateApp() {
+        Uri uri = Uri.parse("market://details?id=" + this.getPackageName());
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            goToMarket.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        }
+        try {
+            startActivity(goToMarket);
+        } catch (ActivityNotFoundException e) {
+            startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://play.google.com/store/apps/details?id=" + this.getPackageName())));
+        }
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -163,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 finish();
                 break;
             case BUTTON_NEUTRAL:
-                //TODO:Add rating feature
+                rateApp();
                 break;
             case BUTTON_NEGATIVE:
                 dialog.dismiss();

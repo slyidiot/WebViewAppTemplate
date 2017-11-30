@@ -2,6 +2,9 @@
 
     <!--Change These-->
     <string name="app_name">Web View App Template</string>
+    <string name="ad_mob_id">ca-app-pub-3940256099942544~3347511713</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
 
     <!--Changing Not Recommended-->
     <string name="no_internet">NO INTERNET CONNECTION\nTAP TO RETRY</string>

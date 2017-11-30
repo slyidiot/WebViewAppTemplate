@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         fetchUrlFromFirebase();
         dummyView.setOnClickListener(this);
+        loadAds();
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -145,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         webView.setVisibility(View.VISIBLE);
                         appIcon.setVisibility(View.GONE);
                         adView.setVisibility(View.VISIBLE);
-                        loadAds();
                     }
 
                     @Override

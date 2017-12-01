@@ -18,6 +18,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private WebView webView;
     private LottieAnimationView loadingAnimationView;
     private LottieAnimationView noInternetAnimationView;
+    private ProgressBar progressBar;
     private TextView noInternetText;
     private ImageView appIcon;
     private View dummyView;
@@ -151,11 +153,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         webView.setVisibility(View.VISIBLE);
                         appIcon.setVisibility(View.GONE);
                         adView.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                        findViewById(R.id.main_container).setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
                     }
 
                     @Override
                     public boolean shouldOverrideUrlLoading(WebView view, String url) {
                         handler.sendEmptyMessage(CLICK_ON_URL);
+                        if (loadingAnimationView.getVisibility() == View.GONE) {
+                            progressBar.setVisibility(View.VISIBLE);
+                            webView.setVisibility(View.GONE);
+                            findViewById(R.id.main_container).setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                        }
                         return false;
                     }
                 });
@@ -178,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         noInternetAnimationView = findViewById(R.id.no_internet_anim);
         appIcon = findViewById(R.id.app_icon);
         adView = findViewById(R.id.adView);
+        progressBar = findViewById(R.id.progress_bar);
     }
 
     public boolean isConnected() throws InterruptedException, IOException {
@@ -222,6 +232,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onBackPressed() {
         if (webView.canGoBack()) {
             webView.goBack();
+            interstitialAdCounter += 1;
+            if (interstitialAdCounter == 4) {
+                interstitialAdCounter = 0;
+                showInterstitialAd();
+            }
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
             builder.setTitle("Exit?");
@@ -268,6 +283,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     dialog.dismiss();
                 } else if (currentDialog == RATE_US_DIALOG) {
                     sharedPreferences.edit().putBoolean("app_rated", true).apply();
+                    finish();
                 }
                 break;
         }

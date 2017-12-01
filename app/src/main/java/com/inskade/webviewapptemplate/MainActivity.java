@@ -68,11 +68,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sharedPreferences = getSharedPreferences(this.getPackageName() + "_SHARED_PREFERENCES", MODE_PRIVATE);
 
         findViews();
+        fetchUrlFromFirebase();
 
+        webView.setWebViewClient(new WebViewClient());
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setOnTouchListener(this);
 
-        fetchUrlFromFirebase();
         dummyView.setOnClickListener(this);
         loadAds();
 
@@ -114,7 +115,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         } else {
                             //handle errors
                         }
-                        loadUrl();
+                        if (!mFirebaseRemoteConfig.getBoolean("app_enabled")) {
+                            throw new RuntimeException("app_not_enabled");
+                        } else {
+                            loadUrl();
+                        }
                     }
                 });
     }
@@ -230,6 +235,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             dialog.show();
 
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        adView.removeAllViews();
+        adView.destroy();
+        super.onDestroy();
     }
 
     @Override
